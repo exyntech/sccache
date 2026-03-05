@@ -216,7 +216,10 @@ counted_array!(pub static ARGS: [ArgInfo<ArgData>; _] = [
     take_arg!("-aux-info", OsString, Separated, PassThrough),
     take_arg!("-b", OsString, Separated, PassThrough),
     flag!("-c", DoCompilation),
+    take_arg!("-fdebug-prefix-map", OsString, Concatenated(b'='), PreprocessorArgument),
     take_arg!("-fdiagnostics-color", OsString, Concatenated(b'='), DiagnosticsColor),
+    take_arg!("-ffile-prefix-map", OsString, Concatenated(b'='), PreprocessorArgument),
+    take_arg!("-fmacro-prefix-map", OsString, Concatenated(b'='), PreprocessorArgument),
     // Old: gcc/clang header module flag.
     flag!("-fmodules", TooHardFlag),
     // New: C++20 gcc modules flag.
@@ -1595,6 +1598,36 @@ mod test {
         assert_eq!(ovec!["-nostdinc"], preprocessor_args);
         assert_eq!(ovec!["-fabc"], common_args);
         assert!(!msvc_show_includes);
+    }
+
+    #[test]
+    fn test_parse_arguments_prefix_map_flags() {
+        let args = stringvec![
+            "-c",
+            "foo.c",
+            "-o",
+            "foo.o",
+            "-fmacro-prefix-map=/home/user/src=.",
+            "-fdebug-prefix-map=/home/user/src=.",
+            "-ffile-prefix-map=/home/user/src=."
+        ];
+        let ParsedArguments {
+            preprocessor_args,
+            common_args,
+            ..
+        } = match parse_arguments_(args, false) {
+            CompilerArguments::Ok(args) => args,
+            o => panic!("Got unexpected parse result: {:?}", o),
+        };
+        assert_eq!(
+            ovec![
+                "-fmacro-prefix-map=/home/user/src=.",
+                "-fdebug-prefix-map=/home/user/src=.",
+                "-ffile-prefix-map=/home/user/src=."
+            ],
+            preprocessor_args
+        );
+        assert!(common_args.is_empty());
     }
 
     #[test]
