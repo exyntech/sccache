@@ -216,10 +216,10 @@ counted_array!(pub static ARGS: [ArgInfo<ArgData>; _] = [
     take_arg!("-aux-info", OsString, Separated, PassThrough),
     take_arg!("-b", OsString, Separated, PassThrough),
     flag!("-c", DoCompilation),
-    take_arg!("-fdebug-prefix-map", OsString, Concatenated(b'='), PreprocessorArgument),
+    take_arg!("-fdebug-prefix-map", OsString, Concatenated(b'='), Unhashed),
     take_arg!("-fdiagnostics-color", OsString, Concatenated(b'='), DiagnosticsColor),
-    take_arg!("-ffile-prefix-map", OsString, Concatenated(b'='), PreprocessorArgument),
-    take_arg!("-fmacro-prefix-map", OsString, Concatenated(b'='), PreprocessorArgument),
+    take_arg!("-ffile-prefix-map", OsString, Concatenated(b'='), Unhashed),
+    take_arg!("-fmacro-prefix-map", OsString, Concatenated(b'='), Unhashed),
     // Old: gcc/clang header module flag.
     flag!("-fmodules", TooHardFlag),
     // New: C++20 gcc modules flag.
